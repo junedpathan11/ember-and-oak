@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Menu, X } from "lucide-react";
 import site from "@/content/site";
 
@@ -10,6 +11,18 @@ import site from "@/content/site";
  * Sticky navigation: Fraunces italic wordmark left, uppercase links right,
  * 1px hairline underneath. Below `md` it collapses to a hamburger that opens
  * a full-screen overlay using the same typographic language.
+ *
+ * The overlay is portalled to `document.body` rather than rendered inside the
+ * header. The header carries `backdrop-blur`, and any `backdrop-filter` other
+ * than `none` makes an element a containing block for its `position: fixed`
+ * descendants (and opens a stacking context). Left inside, the overlay would
+ * size itself to the ~65px header strip instead of the viewport, and its
+ * `z-50` would be trapped under the header's `z-30`, letting the `z-40`
+ * WhatsApp FAB paint over it. The portal escapes both traps.
+ *
+ * No mount gate is needed around `createPortal`: `open` is `false` on the
+ * server and through hydration, and only a click can flip it, so the portal
+ * is never evaluated before `document` exists.
  */
 export default function Navbar() {
   const pathname = usePathname();
@@ -88,57 +101,60 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {/* Full-screen overlay menu */}
-      {open ? (
-        <div
-          id="mobile-menu"
-          className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Site menu"
-        >
-          <div className="flex items-center justify-between border-b px-5 py-4">
-            <span className="font-display text-[22px] italic leading-none tracking-[-0.02em]">
-              {site.business.name}
-            </span>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              aria-label="Close navigation menu"
-              autoFocus
-              className="-mr-2 flex h-11 w-11 items-center justify-center text-ink"
+      {/* Full-screen overlay menu, portalled out of the blurred header */}
+      {open
+        ? createPortal(
+            <div
+              id="mobile-menu"
+              className="fixed inset-0 z-50 flex flex-col bg-bg md:hidden"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Site menu"
             >
-              <X size={22} strokeWidth={1.5} aria-hidden="true" />
-            </button>
-          </div>
-
-          <ul className="flex flex-1 flex-col justify-center px-5 pb-24">
-            {site.nav.map((link) => (
-              <li key={link.href} className="border-b last:border-b-0">
-                <Link
-                  href={link.href}
-                  aria-current={isActive(link.href) ? "page" : undefined}
-                  className={`label-caps block py-6 ${
-                    isActive(link.href) ? "text-primary" : "text-ink"
-                  }`}
+              <div className="flex items-center justify-between border-b px-5 py-4">
+                <span className="font-display text-[22px] italic leading-none tracking-[-0.02em]">
+                  {site.business.name}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setOpen(false)}
+                  aria-label="Close navigation menu"
+                  autoFocus
+                  className="-mr-2 flex h-11 w-11 items-center justify-center text-ink"
                 >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+                  <X size={22} strokeWidth={1.5} aria-hidden="true" />
+                </button>
+              </div>
 
-          <div className="border-t px-5 py-6">
-            <a
-              href={site.business.phoneHref}
-              className="font-display text-2xl tracking-[-0.02em]"
-            >
-              {site.business.phone}
-            </a>
-            <p className="eyebrow mt-2">{site.business.demoLabel}</p>
-          </div>
-        </div>
-      ) : null}
+              <ul className="flex flex-1 flex-col justify-center px-5 pb-24">
+                {site.nav.map((link) => (
+                  <li key={link.href} className="border-b last:border-b-0">
+                    <Link
+                      href={link.href}
+                      aria-current={isActive(link.href) ? "page" : undefined}
+                      className={`label-caps block py-6 ${
+                        isActive(link.href) ? "text-primary" : "text-ink"
+                      }`}
+                    >
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="border-t px-5 py-6">
+                <a
+                  href={site.business.phoneHref}
+                  className="font-display text-2xl tracking-[-0.02em]"
+                >
+                  {site.business.phone}
+                </a>
+                <p className="eyebrow mt-2">{site.business.demoLabel}</p>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </header>
   );
 }
