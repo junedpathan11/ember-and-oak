@@ -14,11 +14,14 @@ import site from "@/content/site";
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [renderedFor, setRenderedFor] = useState(pathname);
 
-  // Close the overlay on navigation.
-  useEffect(() => {
-    setOpen(false);
-  }, [pathname]);
+  // Close the overlay on navigation. Done during render (not in an effect) so
+  // the menu never paints open on the new route.
+  if (renderedFor !== pathname) {
+    setRenderedFor(pathname);
+    if (open) setOpen(false);
+  }
 
   // Lock body scroll and support Escape while the overlay is open.
   useEffect(() => {

@@ -16,42 +16,31 @@ const variants: Record<Variant, string> = {
   "ghost-light": "border-bg bg-transparent text-bg hover:bg-bg hover:text-ink",
 };
 
-interface CommonProps {
+interface StyleProps {
   variant?: Variant;
   className?: string;
   children: ReactNode;
 }
 
-type ButtonAsButton = CommonProps &
-  Omit<ComponentPropsWithoutRef<"button">, "className" | "children"> & {
-    href?: never;
-  };
+type ButtonAsButton = StyleProps &
+  Omit<ComponentPropsWithoutRef<"button">, keyof StyleProps> & { href?: never };
 
-type ButtonAsLink = CommonProps &
-  Omit<ComponentPropsWithoutRef<"a">, "className" | "children" | "href"> & {
-    href: string;
-  };
+type ButtonAsLink = StyleProps &
+  Omit<ComponentPropsWithoutRef<"a">, keyof StyleProps | "href"> & { href: string };
 
 type ButtonProps = ButtonAsButton | ButtonAsLink;
 
 /**
  * The single button primitive: uppercase 12px / 0.15em tracking / 14px 28px
- * padding / 4px radius, per the design system. Renders an <a>, a next/link or
- * a <button> depending on `href`.
+ * padding / 4px radius, per the design system. Renders a next/link for
+ * internal hrefs, an <a> for external ones, otherwise a <button>.
  */
 export default function Button(props: ButtonProps) {
-  const { variant = "primary", className = "", children } = props;
-  const classes = `${base} ${variants[variant]} ${className}`.trim();
+  if (props.href !== undefined) {
+    const { href, variant = "primary", className = "", children, ...rest } = props;
+    const classes = `${base} ${variants[variant]} ${className}`.trim();
 
-  if ("href" in props && props.href !== undefined) {
-    const { href, variant: _variant, className: _className, children: _children, ...rest } = props;
-    void _variant;
-    void _className;
-    void _children;
-
-    const isInternal = href.startsWith("/");
-
-    if (isInternal) {
+    if (href.startsWith("/")) {
       return (
         <Link href={href} className={classes} {...rest}>
           {children}
@@ -66,13 +55,13 @@ export default function Button(props: ButtonProps) {
     );
   }
 
-  const { variant: _v, className: _c, children: _ch, type, ...rest } = props as ButtonAsButton;
-  void _v;
-  void _c;
-  void _ch;
+  const { variant = "primary", className = "", children, type = "button", ...rest } = props;
+  const classes = `${base} ${variants[variant]} ${className}`.trim();
+  // `href` is typed as `never` on this branch and is always undefined here.
+  delete (rest as { href?: undefined }).href;
 
   return (
-    <button type={type ?? "button"} className={classes} {...rest}>
+    <button type={type} className={classes} {...rest}>
       {children}
     </button>
   );

@@ -16,12 +16,18 @@ export default function DemoBanner() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    try {
-      if (window.localStorage.getItem(STORAGE_KEY) !== "true") setVisible(true);
-    } catch {
-      // localStorage unavailable (private mode) — show the notice anyway.
-      setVisible(true);
-    }
+    // Deferred a frame so the state update is not synchronous inside the
+    // effect, which would trigger a cascading render.
+    const id = window.requestAnimationFrame(() => {
+      try {
+        setVisible(window.localStorage.getItem(STORAGE_KEY) !== "true");
+      } catch {
+        // localStorage unavailable (private mode) — show the notice anyway.
+        setVisible(true);
+      }
+    });
+
+    return () => window.cancelAnimationFrame(id);
   }, []);
 
   function dismiss() {

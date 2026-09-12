@@ -1,11 +1,25 @@
 "use client";
 
 import { motion } from "framer-motion";
-import type { ElementType, ReactNode } from "react";
+import type { ReactNode } from "react";
+
+/**
+ * Motion components are created once at module scope — creating them during
+ * render would remount (and reset) the subtree on every render.
+ */
+const TAGS = {
+  div: motion.div,
+  article: motion.article,
+  figure: motion.figure,
+  section: motion.section,
+  li: motion.li,
+} as const;
+
+export type FadeUpTag = keyof typeof TAGS;
 
 interface FadeUpProps {
   children: ReactNode;
-  as?: ElementType;
+  as?: FadeUpTag;
   className?: string;
   /** Small offset for the rare case where two adjacent blocks should not fire together. */
   delay?: number;
@@ -23,7 +37,7 @@ export default function FadeUp({
   delay = 0,
   id,
 }: FadeUpProps) {
-  const MotionTag = motion.create(as as ElementType);
+  const MotionTag = TAGS[as];
 
   return (
     <MotionTag
