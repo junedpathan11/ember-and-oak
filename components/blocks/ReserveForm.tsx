@@ -19,12 +19,17 @@ import {
 } from "@/lib/forms";
 import { getReservationWhatsAppUrl } from "@/lib/whatsapp";
 
+interface ReserveFormProps {
+  requestedDish?: string;
+}
+
 interface FormState {
   name: string;
   phone: string;
   date: string;
   time: string;
   party: string;
+  dish: string;
   occasion: string;
 }
 
@@ -36,8 +41,19 @@ const EMPTY: FormState = {
   date: "",
   time: "",
   party: "",
+  dish: "",
   occasion: "",
 };
+
+const MENU_DISHES = site.menu.flatMap((category) => category.dishes);
+
+function initialValues(requestedDish?: string): FormState {
+  const dish = MENU_DISHES.find(
+    (option) => option.name === requestedDish || option.slug === requestedDish,
+  );
+
+  return { ...EMPTY, dish: dish?.slug ?? "" };
+}
 
 function generateBookingRef(): string {
   const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
@@ -48,13 +64,13 @@ function generateBookingRef(): string {
   return result;
 }
 
-export default function ReserveForm() {
+export default function ReserveForm({ requestedDish }: ReserveFormProps) {
   const { reservation, business } = site;
 
   const configured = isFormConfigured();
   const minDate = useMemo(() => todayISO(), []);
 
-  const [values, setValues] = useState<FormState>(EMPTY);
+  const [values, setValues] = useState<FormState>(() => initialValues(requestedDish));
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
   const [bookingSummary, setBookingSummary] = useState<BookingSummary | null>(null);
@@ -94,12 +110,15 @@ export default function ReserveForm() {
       reservation.partySizes.find((opt) => opt.value === values.party)?.label ??
       values.party;
 
+    const dishName = MENU_DISHES.find((dish) => dish.slug === values.dish)?.name;
+
     return getReservationWhatsAppUrl({
       name: values.name,
       phone: values.phone,
       date: values.date,
       time: values.time,
       party: partyLabel,
+      dish: dishName,
       occasion: occasionLabel,
     });
   }, [values, reservation.occasions, reservation.partySizes]);
@@ -124,6 +143,10 @@ export default function ReserveForm() {
       reservation.occasions.find((option) => option.value === values.occasion)?.label ??
       "No occasion";
 
+    const dishName =
+      MENU_DISHES.find((dish) => dish.slug === values.dish)?.name ??
+      reservation.noSpecificDishLabel;
+
     const ref = generateBookingRef();
 
     const result = await submitToWeb3Forms({
@@ -136,6 +159,7 @@ export default function ReserveForm() {
       date: values.date,
       time: values.time,
       party_size: values.party,
+      dish_of_interest: dishName,
       occasion: occasionLabel,
     });
 
@@ -150,9 +174,10 @@ export default function ReserveForm() {
         date: values.date,
         time: values.time,
         party: values.party,
+        dish: values.dish ? dishName : undefined,
         occasion: occasionLabel,
       });
-      setValues(EMPTY);
+      setValues({ ...EMPTY });
       return;
     }
 
@@ -266,6 +291,28 @@ export default function ReserveForm() {
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
+            ))}
+          </select>
+        </Field>
+
+        <Field id="dish" label="Dish of interest" className="sm:col-span-2">
+          <select
+            id="dish"
+            name="dish_of_interest"
+            value={values.dish}
+            disabled={!configured || submitting}
+            onChange={(event) => update("dish", event.target.value)}
+            className={fieldClasses}
+          >
+            <option value="">{reservation.noSpecificDishLabel}</option>
+            {site.menu.map((category) => (
+              <optgroup key={category.id} label={category.label}>
+                {category.dishes.map((dish) => (
+                  <option key={dish.slug} value={dish.slug}>
+                    {dish.name}
+                  </option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </Field>

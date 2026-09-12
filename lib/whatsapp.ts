@@ -39,6 +39,7 @@ export interface ReservationWhatsAppDetails {
   date?: string;
   time?: string;
   party?: string;
+  dish?: string;
   occasion?: string;
   ref?: string;
 }
@@ -54,6 +55,9 @@ export function getReservationWhatsAppUrl(
   if (details.date) lines.push(`• Date: ${details.date}`);
   if (details.time) lines.push(`• Time: ${details.time}`);
   if (details.party) lines.push(`• Guests: ${details.party}`);
+  if (details.dish && details.dish.trim()) {
+    lines.push(`• Dish of interest: ${details.dish.trim()}`);
+  }
   if (details.occasion && details.occasion !== "No occasion") {
     lines.push(`• Occasion: ${details.occasion}`);
   }

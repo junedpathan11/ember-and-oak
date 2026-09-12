@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { Dish } from "@/content/site";
 import site from "@/content/site";
 
@@ -52,6 +53,14 @@ export default function MenuRow({ dish }: MenuRowProps) {
         <p className="mt-1.5 max-w-prose text-[14px] leading-relaxed text-muted sm:text-[15px]">
           {dish.desc}
         </p>
+
+        <Link
+          href={`/reserve?dish=${encodeURIComponent(dish.name)}`}
+          aria-label={`Reserve a table for ${dish.name}`}
+          className="label-caps mt-2 inline-flex min-h-11 items-center border-b border-ink transition-colors duration-300 hover:border-primary hover:text-primary"
+        >
+          Reserve a table
+        </Link>
       </div>
     </li>
   );
