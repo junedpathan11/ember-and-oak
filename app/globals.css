@@ -1,0 +1,162 @@
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+
+/* =========================================================
+   Design tokens — the ONLY place raw colour values live.
+   Components reference the Tailwind mappings (bg-bg, text-ink,
+   border-hairline, ...) declared in tailwind.config.ts.
+   ========================================================= */
+:root {
+  --color-bg: #faf7f2; /* warm cream, page background */
+  --color-surface: #ffffff; /* cards / panels */
+  --color-ink: #1c1917; /* primary text, near-black warm */
+  --color-muted: #78716c; /* secondary text */
+  --color-primary: #b45309; /* burnt amber — buttons, accents only */
+  --color-hairline: #e7e5e4; /* 1px borders / dividers */
+
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    text-wrap: balance;
+  }
+
+  /* Hairlines are the primary structural device of this design. */
+  hr {
+    border: 0;
+    border-top: 1px solid var(--color-hairline);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+
+  /* Inputs never below 16px — prevents iOS zoom-on-focus. */
+  input,
+  select,
+  textarea,
+  button {
+    font-family: inherit;
+    font-size: 16px;
+  }
+
+  ::selection {
+    background: var(--color-ink);
+    color: var(--color-bg);
+  }
+}
+
+@layer components {
+  /* Eyebrow label — Inter 12px, uppercase, 0.15em tracking, muted. */
+  .eyebrow {
+    font-size: 12px;
+    line-height: 1.4;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--color-muted);
+  }
+
+  /* Shared uppercase micro-label used by nav links and buttons. */
+  .label-caps {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    line-height: 1;
+  }
+
+  .display-hero {
+    font-size: clamp(2.75rem, 7vw, 6rem);
+  }
+
+  .display-xl {
+    font-size: clamp(2.25rem, 5.5vw, 4rem);
+  }
+
+  .display-lg {
+    font-size: clamp(1.75rem, 3.6vw, 2.75rem);
+  }
+
+  /* Body copy measure. */
+  .prose-measure {
+    max-width: 65ch;
+  }
+}
+
+/* ---------- Keyframes (the only motion defined in CSS) ---------- */
+
+/* Hero: slow 12s zoom on load, once. */
+@keyframes hero-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.08);
+  }
+}
+
+.animate-hero-zoom {
+  animation: hero-zoom 12s ease-out forwards;
+}
+
+/* Marquee: slow 30s loop. */
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee-scroll 30s linear infinite;
+}
+
+/* WhatsApp FAB: subtle one-shot pulse when first scrolled into view. */
+@keyframes fab-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(180 83 9 / 45%);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgb(180 83 9 / 0%);
+  }
+}
+
+.animate-fab-pulse {
+  animation: fab-pulse 1.6s ease-out 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
