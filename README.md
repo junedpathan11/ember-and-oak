@@ -2,8 +2,8 @@
 
 > **⚠️ Concept demo website.** Ember & Oak is a **fictional restaurant**. This
 > is a portfolio/design piece — the address, phone number, email and reviews are
-> invented, and no reservation made here reaches anybody. A dismissible notice
-> saying so appears at the top of every page.
+> concept placeholders. A subtle label in the footer identifies the site as a
+> concept demo.
 
 A production-quality marketing site for an imagined wood-fired Indian grill in
 Surat. Editorial layout, warm cream palette, hairline rules, restrained motion.
@@ -21,8 +21,9 @@ Surat. Editorial layout, warm cream palette, hairline rules, restrained motion.
 | Styling | Tailwind CSS v4 with CSS-variable design tokens |
 | Motion | framer-motion (scroll fade-up only) |
 | Icons | lucide-react |
-| Fonts | Fraunces + Inter via `next/font/google` |
-| Forms | Web3Forms (no backend, no database) |
+| Fonts | Fraunces + Inter via `next/font/local` |
+| WhatsApp | Centralized URL builder (`lib/whatsapp.ts`) |
+| Forms | Web3Forms with client-side validation & safety guard |
 | Deploy target | Vercel |
 
 ---
@@ -58,25 +59,27 @@ The two forms (`/reserve` and `/private-dining`) post to
    NEXT_PUBLIC_WEB3FORMS_KEY=paste-your-real-access-key-here
    ```
 
-   `.env.local` already exists (copy it from `.env.example` if not). It is
-   **gitignored and must never be committed**; `.env.example` is the committed
-   template.
+   `.env.local` is **gitignored and must never be committed**; `.env.example`
+   is the committed template.
 3. Restart the dev server — `NEXT_PUBLIC_*` values are inlined at build time.
 4. On Vercel, add the same variable under
    **Project → Settings → Environment Variables**, then redeploy.
 
 **Until a real key is present**, both forms render an inline notice —
 *"Form not configured — add your Web3Forms access key to .env.local."* — and the
-submit button stays disabled. The success state is only ever shown after a
-confirmed **HTTP 200** with `success: true` from the API; failures surface the
-API's own message plus a WhatsApp fallback link.
+submit button stays disabled.
+
+A submission is only treated as successful upon a confirmed **HTTP 200** response
+from the Web3Forms API. On submission, a booking request reference (e.g. `EO-7X2K`)
+and summary are generated, with one-click actions to copy details or send the request
+directly via WhatsApp to `+91 63523 69937`.
 
 Optional: set `NEXT_PUBLIC_SITE_URL` to your production domain so canonical and
 Open Graph URLs are absolute (defaults to `https://emberandoak.vercel.app`).
 
 ---
 
-## Editing content
+## Editing content & WhatsApp
 
 **All business content lives in [`content/site.ts`](content/site.ts)**, typed by
 the `SiteConfig` interface. Components never hardcode copy, prices, hours or
@@ -85,11 +88,19 @@ page updates.
 
 ```ts
 export const site: SiteConfig = {
-  business: { name: "Ember & Oak", phone: "+91 90000 00000", ... },
+  business: {
+    name: "Ember & Oak",
+    phone: "+91 63523 69937",
+    phoneHref: "tel:+916352369937",
+    ...
+  },
   menu: [ { id: "starters", label: "Starters", dishes: [...] }, ... ],
   ...
 };
 ```
+
+WhatsApp links are centralized in [`lib/whatsapp.ts`](lib/whatsapp.ts) and use
+the official business number `916352369937`.
 
 ### Design tokens
 
@@ -116,19 +127,19 @@ Tokens are declared once as CSS variables in
 app/
   (pages)/
     page.tsx                 /                home
-    menu/page.tsx            /menu
-    reserve/page.tsx         /reserve
-    private-dining/page.tsx  /private-dining
-  layout.tsx                 shell: demo banner, navbar, footer, FAB
+    menu/page.tsx            /menu            menu categories + 72px thumbnails
+    reserve/page.tsx         /reserve         reservation request
+    private-dining/page.tsx  /private-dining  rooms & set menus
+  layout.tsx                 shell: navbar, footer, WhatsApp FAB
   globals.css                design tokens + keyframes
-  fonts.ts                   Fraunces + Inter
+  fonts.ts                   Fraunces + Inter local font loaders
   not-found.tsx              custom 404
   sitemap.ts  robots.ts
 components/
   blocks/                    Navbar, Hero, Marquee, DishStrip, AboutTeaser,
                              Testimonials, HoursLocation, CTABanner, Footer,
-                             WhatsAppFab, DemoBanner, MenuTabs, ReserveForm,
-                             EnquiryForm, FormNotice
+                             WhatsAppFab, MenuTabs, ReserveForm, ReservePanels,
+                             BookingSuccess, EnquiryForm, FormNotice
   ui/                        Button, SectionHeading, MenuRow, DishImage,
                              Field, FadeUp, JsonLd
 content/site.ts              all business data (SiteConfig)
@@ -136,7 +147,9 @@ lib/
   seo.ts                     metadata builder + JSON-LD generators
   forms.ts                   Web3Forms key guard, submit, validators
   tokens.ts                  token values for non-CSS contexts (theme-color)
-public/images/               photography
+  whatsapp.ts                centralized WhatsApp URL builder (916352369937)
+public/images/               hero, signature, and private dining photography
+public/images/dishes/        all 16 menu dish photographs
 ```
 
 ---
@@ -151,25 +164,21 @@ public/images/               photography
 - Contrast meets WCAG AA: ink on cream 16.4:1, muted on cream 4.49:1,
   primary `#B45309` on cream 4.7:1, cream on primary 4.7:1.
 - `prefers-reduced-motion` disables all animation.
-- Unique title/description/canonical per page, Open Graph + Twitter cards,
+- Unique title/description/canonical per page, Open Graph + Twitter cards (1200×630),
   `Restaurant` / `Menu` / `BreadcrumbList` JSON-LD, sitemap and robots.
 
 ---
 
 ## Known limitations
 
-- **Fictional business.** Content, reviews and contact details are invented.
-- **Request-only forms.** No availability engine — submissions are enquiries;
-  there is no booking confirmation, calendar or payment.
-- **Photography is AI-generated** and stored in `public/images`. The brief
-  referenced Unsplash source images (e.g.
-  `images.unsplash.com/photo-1555939594-58d7cb561ad1`); local files are used
-  instead so the site has no third-party runtime image dependency. To use remote
-  images, swap the `image` fields in `content/site.ts` and add the host to
-  `images.remotePatterns` in `next.config.ts`.
+- **Fictional business.** Content, reviews and contact details are concept pieces.
+- **Request-only forms.** Submissions are booking requests confirmed manually via
+  WhatsApp; there is no automated table locking or payment processing.
+- **Photography is served locally** in `public/images/` and `public/images/dishes/`
+  with no external third-party runtime image dependency.
 - **No dark mode, i18n, CMS, cart, accounts or cookie banner** — deliberately
   out of scope.
-- The Google Maps embed is a plain `iframe`; it sets Google cookies once loaded.
+- The Google Maps embed is a standard `iframe`.
 
 ---
 

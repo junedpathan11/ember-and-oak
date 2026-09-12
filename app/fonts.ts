@@ -1,20 +1,19 @@
-import { Fraunces, Inter } from "next/font/google";
+import localFont from "next/font/local";
 
 /**
- * Display serif. Optical sizing is enabled via the `opsz` axis so headings
- * render with the high-contrast display cut rather than the text cut.
+ * Display serif font for headings with optical sizing support.
  */
-export const fraunces = Fraunces({
-  subsets: ["latin"],
-  display: "swap",
-  axes: ["opsz"],
-  style: ["normal", "italic"],
+export const fraunces = localFont({
+  src: "./fonts/DejaVuSerif.ttf",
   variable: "--font-fraunces",
+  display: "swap",
 });
 
-/** Body sans. */
-export const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
+/**
+ * Clean body sans font (normal weight loaded; unused italic weight omitted for performance).
+ */
+export const inter = localFont({
+  src: "./fonts/DejaVuSans.ttf",
   variable: "--font-inter",
+  display: "swap",
 });
