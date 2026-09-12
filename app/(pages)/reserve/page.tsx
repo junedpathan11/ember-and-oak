@@ -13,8 +13,14 @@ export const metadata: Metadata = buildMetadata({
   path: "/reserve",
 });
 
-export default function ReservePage() {
+interface ReservePageProps {
+  searchParams: Promise<{ dish?: string | string[] }>;
+}
+
+export default async function ReservePage({ searchParams }: ReservePageProps) {
   const { reservation } = site;
+  const { dish } = await searchParams;
+  const requestedDish = Array.isArray(dish) ? dish[0] : dish;
 
   return (
     <>
@@ -37,7 +43,7 @@ export default function ReservePage() {
           {/* Form */}
           <FadeUp className="md:col-span-7">
             <h2 className="sr-only">Reservation request form</h2>
-            <ReserveForm />
+            <ReserveForm key={requestedDish ?? "general"} requestedDish={requestedDish} />
           </FadeUp>
 
           {/* Prefer to talk & Hours */}

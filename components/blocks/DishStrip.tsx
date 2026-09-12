@@ -64,12 +64,21 @@ export default function DishStrip() {
                   ₹{dish.price}
                 </p>
 
-                <Link
-                  href="/menu"
-                  className="label-caps mt-7 inline-block border-b border-ink pb-1 transition-colors duration-300 hover:border-primary hover:text-primary"
-                >
-                  See the full menu
-                </Link>
+                <div className="mt-5 flex flex-wrap items-center gap-x-6">
+                  <Link
+                    href={`/reserve?dish=${encodeURIComponent(dish.name)}`}
+                    aria-label={`Reserve a table for ${dish.name}`}
+                    className="label-caps inline-flex min-h-11 items-center border-b border-ink transition-colors duration-300 hover:border-primary hover:text-primary"
+                  >
+                    Reserve a table
+                  </Link>
+                  <Link
+                    href="/menu"
+                    className="label-caps inline-flex min-h-11 items-center border-b border-ink transition-colors duration-300 hover:border-primary hover:text-primary"
+                  >
+                    See the full menu
+                  </Link>
+                </div>
               </div>
             </FadeUp>
           );

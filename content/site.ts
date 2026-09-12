@@ -94,6 +94,7 @@ export interface Reservation {
   timeSlots: string[];
   partySizes: SelectOption[];
   occasions: SelectOption[];
+  noSpecificDishLabel: string;
   largePartyValue: string;
   largePartyNotice: string;
   talkPanel: { heading: string; body: string; whatsappCta: string };
@@ -466,6 +467,7 @@ export const site: SiteConfig = {
       { value: "anniversary", label: "Anniversary" },
       { value: "business", label: "Business" },
     ],
+    noSpecificDishLabel: "No specific dish",
     largePartyValue: "10+",
     largePartyNotice: "Parties over ten are looked after by our private dining team.",
     talkPanel: {

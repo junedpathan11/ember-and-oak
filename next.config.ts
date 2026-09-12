@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  allowedDevOrigins: ["192.168.0.103"],
   images: {
     // Photography is served from /public, so only the modern formats matter.
     formats: ["image/avif", "image/webp"],

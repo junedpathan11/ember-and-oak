@@ -13,6 +13,7 @@ export interface BookingSummary {
   date: string;
   time: string;
   party: string;
+  dish?: string;
   occasion?: string;
 }
 
@@ -48,6 +49,7 @@ export default function BookingSuccess({ summary, onReset }: BookingSuccessProps
     `Date: ${formattedDate}`,
     `Time: ${summary.time}`,
     `Party: ${partyLabel}`,
+    summary.dish ? `Dish of interest: ${summary.dish}` : null,
     summary.occasion && summary.occasion !== "No occasion"
       ? `Occasion: ${summary.occasion}`
       : null,
@@ -80,6 +82,7 @@ export default function BookingSuccess({ summary, onReset }: BookingSuccessProps
     date: summary.date,
     time: summary.time,
     party: partyLabel,
+    dish: summary.dish,
     occasion: summary.occasion,
     ref: summary.ref,
   });
@@ -127,6 +130,12 @@ export default function BookingSuccess({ summary, onReset }: BookingSuccessProps
             <dt className="text-muted">Party Size</dt>
             <dd className="font-medium text-ink">{partyLabel}</dd>
           </div>
+          {summary.dish ? (
+            <div className="col-span-2">
+              <dt className="text-muted">Dish of interest</dt>
+              <dd className="font-medium text-ink">{summary.dish}</dd>
+            </div>
+          ) : null}
           {summary.occasion && summary.occasion !== "No occasion" ? (
             <div className="col-span-2">
               <dt className="text-muted">Occasion</dt>
