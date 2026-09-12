@@ -3,19 +3,23 @@
  * Components must never hardcode text, prices, hours or links — import from here.
  *
  * NOTE: "Ember & Oak" is a FICTIONAL restaurant. This site is a portfolio
- * concept demo and is labelled as such on every page.
+ * concept demo and is labelled as such in the footer.
  */
+
+import { getGeneralWhatsAppUrl } from "@/lib/whatsapp";
 
 export interface Dish {
   name: string;
+  slug: string;
   desc: string;
   price: number;
   veg?: boolean;
+  image: string;
+  alt: string;
 }
 
 export interface SignatureDish extends Dish {
-  image: string;
-  alt: string;
+  wideImage?: string;
 }
 
 export interface MenuCategory {
@@ -80,6 +84,7 @@ export interface PrivateDining {
   setMenuNote: string;
   setMenus: SetMenu[];
   hero: { image: string; alt: string; headline: string; eyebrow: string };
+  ogImage: string;
 }
 
 export interface Reservation {
@@ -136,15 +141,6 @@ export interface SiteConfig {
   footer: { navHeading: string; hoursHeading: string; findUsHeading: string; copyright: string };
 }
 
-/* Photography note ------------------------------------------------------
- * The brief referenced Unsplash source imagery, e.g. the hero:
- *   https://images.unsplash.com/photo-1555939594-58d7cb561ad1
- * Images are served locally from /public/images instead so the demo has no
- * third-party runtime dependency, no remotePatterns config and no hotlinking.
- * Swap the `image` fields below for remote URLs if you prefer (add the host to
- * `images.remotePatterns` in next.config.ts first).
- * --------------------------------------------------------------------- */
-
 export const site: SiteConfig = {
   business: {
     name: "Ember & Oak",
@@ -152,10 +148,9 @@ export const site: SiteConfig = {
     description:
       "Wood-fired Indian grill. Charcoal, patience, and recipes that travelled three generations.",
     address: "21, Ghod Dod Road, Athwa, Surat, Gujarat 395007",
-    phone: "+91 90000 00000",
-    phoneHref: "tel:+919000000000",
-    whatsapp:
-      "https://wa.me/919000000000?text=Hi%20Ember%20%26%20Oak%2C%20I%27d%20like%20to%20reserve%20a%20table.",
+    phone: "+91 63523 69937",
+    phoneHref: "tel:+916352369937",
+    whatsapp: getGeneralWhatsAppUrl(),
     email: "hello@emberandoak.in",
     hours: [
       { days: "Tuesday – Sunday", time: "Lunch 12:00 – 15:30 · Dinner 19:00 – 23:00" },
@@ -181,28 +176,40 @@ export const site: SiteConfig = {
       label: "Starters",
       dishes: [
         {
+          slug: "charred-paneer-tikka",
           name: "Charred Paneer Tikka",
           desc: "Smoked hung curd, mint chutney, pickled onion",
           price: 345,
           veg: true,
+          image: "/images/dishes/charred-paneer-tikka.jpg",
+          alt: "Charred paneer tikka skewers with mint chutney and pickled onion",
         },
         {
+          slug: "ember-chicken-65",
           name: "Ember Chicken 65",
           desc: "Curry-leaf temper, burnt garlic, lime ash",
           price: 395,
           veg: false,
+          image: "/images/dishes/ember-chicken-65.jpg",
+          alt: "Crispy Ember Chicken 65 garnished with curry leaves and burnt garlic",
         },
         {
+          slug: "tandoori-mushrooms",
           name: "Tandoori Mushrooms",
           desc: "Kashmiri chilli, kasundi mayo, charred scallion",
           price: 365,
           veg: true,
+          image: "/images/dishes/tandoori-mushrooms.jpg",
+          alt: "Grilled tandoori button mushrooms with mustard kasundi and charred scallion",
         },
         {
+          slug: "dahi-kebab",
           name: "Dahi Kebab",
           desc: "Crisp hung-curd patties, beetroot reduction",
           price: 325,
           veg: true,
+          image: "/images/dishes/dahi-kebab.jpg",
+          alt: "Crisp golden dahi kebab patties with beetroot reduction on dark ceramic",
         },
       ],
     },
@@ -211,28 +218,40 @@ export const site: SiteConfig = {
       label: "Mains",
       dishes: [
         {
+          slug: "ember-butter-chicken",
           name: "Ember Butter Chicken",
           desc: "12-hour tomato makhani, wood-fire finish",
           price: 495,
           veg: false,
+          image: "/images/dishes/ember-butter-chicken.jpg",
+          alt: "Ember butter chicken in a copper bowl with a swirl of fresh cream",
         },
         {
+          slug: "dum-biryani",
           name: "Dum Biryani",
           desc: "Aged basmati, saffron, sealed handi, mirchi ka salan",
           price: 445,
           veg: false,
+          image: "/images/dishes/dum-biryani.jpg",
+          alt: "Saffron dum biryani steaming in a clay handi with mirchi ka salan",
         },
         {
+          slug: "smoked-dal-makhani",
           name: "Smoked Dal Makhani",
           desc: "48-hour black urad, white butter, ember tempering",
           price: 395,
           veg: true,
+          image: "/images/dishes/smoked-dal-makhani.jpg",
+          alt: "Smoked dal makhani in an iron karahi topped with white butter",
         },
         {
+          slug: "lamb-seekh-kebab",
           name: "Lamb Seekh Kebab",
           desc: "Hand-minced, green chilli, onion confit",
           price: 545,
           veg: false,
+          image: "/images/dishes/lamb-seekh-kebab.jpg",
+          alt: "Succulent grilled lamb seekh kebabs on a dark platter with onion confit",
         },
       ],
     },
@@ -241,28 +260,40 @@ export const site: SiteConfig = {
       label: "Desserts",
       dishes: [
         {
+          slug: "burnt-basque-cheesecake",
           name: "Burnt Basque Cheesecake",
           desc: "Mishti doi cream, jaggery caramel",
           price: 295,
           veg: true,
+          image: "/images/dishes/burnt-basque-cheesecake.jpg",
+          alt: "Slice of Burnt Basque cheesecake with mishti doi cream and jaggery caramel",
         },
         {
+          slug: "gulab-jamun-brulee",
           name: "Gulab Jamun Brûlée",
           desc: "Torched rabri, pistachio dust",
           price: 265,
           veg: true,
+          image: "/images/dishes/gulab-jamun-brulee.jpg",
+          alt: "Gulab jamun brûlée in torched rabri dusted with crushed pistachio",
         },
         {
+          slug: "filter-coffee-tres-leches",
           name: "Filter Coffee Tres Leches",
           desc: "Baba Budan estate, chicory cream",
           price: 285,
           veg: true,
+          image: "/images/dishes/filter-coffee-tres-leches.jpg",
+          alt: "South Indian filter coffee tres leches cake with chicory cream swirl",
         },
         {
+          slug: "chocolate-chai-tart",
           name: "Chocolate Chai Tart",
           desc: "Dark ganache, masala chai crumb",
           price: 275,
           veg: true,
+          image: "/images/dishes/chocolate-chai-tart.jpg",
+          alt: "Artisan dark chocolate ganache chai tart with spiced pastry crust",
         },
       ],
     },
@@ -271,28 +302,40 @@ export const site: SiteConfig = {
       label: "Drinks",
       dishes: [
         {
+          slug: "sol-kadhi",
           name: "Sol Kadhi",
           desc: "Kokum, coconut milk, toasted cumin",
           price: 145,
           veg: true,
+          image: "/images/dishes/sol-kadhi.jpg",
+          alt: "Chilled kokum and coconut milk sol kadhi in a glass with toasted cumin",
         },
         {
+          slug: "aam-panna-spritz",
           name: "Aam Panna Spritz",
           desc: "Raw mango, mint, soda",
           price: 165,
           veg: true,
+          image: "/images/dishes/aam-panna-spritz.jpg",
+          alt: "Refreshing raw mango aam panna spritz with fresh mint and soda",
         },
         {
+          slug: "masala-chai",
           name: "Masala Chai",
           desc: "Assam leaves, whole spice, jaggery",
           price: 125,
           veg: true,
+          image: "/images/dishes/masala-chai.jpg",
+          alt: "Traditional spiced masala chai with whole aromatic spices and milk",
         },
         {
+          slug: "fresh-lime-soda",
           name: "Fresh Lime Soda",
           desc: "Sweet, salted, or ember-smoked",
           price: 135,
           veg: true,
+          image: "/images/dishes/fresh-lime-soda.jpg",
+          alt: "Sparkling fresh lime soda garnished with fresh mint and lime wheel",
         },
       ],
     },
@@ -300,6 +343,7 @@ export const site: SiteConfig = {
 
   signatureDishes: [
     {
+      slug: "ember-butter-chicken",
       name: "Ember Butter Chicken",
       desc: "12-hour tomato makhani, wood-fire finish",
       price: 495,
@@ -308,6 +352,7 @@ export const site: SiteConfig = {
       alt: "Ember butter chicken served in a copper bowl with a swirl of cream",
     },
     {
+      slug: "dum-biryani",
       name: "Dum Biryani",
       desc: "Aged basmati, saffron, sealed handi, mirchi ka salan",
       price: 445,
@@ -316,6 +361,7 @@ export const site: SiteConfig = {
       alt: "Saffron dum biryani steaming in a clay handi with the seal broken open",
     },
     {
+      slug: "smoked-dal-makhani",
       name: "Smoked Dal Makhani",
       desc: "48-hour black urad, white butter, ember tempering",
       price: 395,
@@ -324,6 +370,7 @@ export const site: SiteConfig = {
       alt: "Smoked dal makhani in an iron karahi topped with melting white butter",
     },
     {
+      slug: "charred-paneer-tikka",
       name: "Charred Paneer Tikka",
       desc: "The dish that built our name",
       price: 345,
@@ -374,6 +421,7 @@ export const site: SiteConfig = {
       headline: "Room for every occasion.",
       eyebrow: "Private Dining",
     },
+    ogImage: "/images/og-private-dining.jpg",
   },
 
   reservation: {

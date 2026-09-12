@@ -9,14 +9,15 @@ export const siteUrl = (
   process.env.NEXT_PUBLIC_SITE_URL ?? "https://emberandoak.vercel.app"
 ).replace(/\/$/, "");
 
-/** Shared OG image — reuses the hero photograph. */
-export const ogImage = site.home.hero.image;
+/** Shared OG image — dedicated 1200x630 social card. */
+export const ogImage = "/images/og-default.jpg";
 
 interface PageMetaInput {
   title: string;
   description: string;
   path: string;
   image?: string;
+  imageAlt?: string;
   /** Bypass the "%s · Ember & Oak" template (used by the home page). */
   absoluteTitle?: boolean;
 }
@@ -30,6 +31,7 @@ export function buildMetadata({
   description,
   path,
   image = ogImage,
+  imageAlt = "Ember & Oak — Wood-fired Indian grill in Surat",
   absoluteTitle = false,
 }: PageMetaInput): Metadata {
   const url = path === "/" ? siteUrl : `${siteUrl}${path}`;
@@ -51,7 +53,7 @@ export function buildMetadata({
           url: absoluteImage,
           width: 1200,
           height: 630,
-          alt: site.home.hero.alt,
+          alt: imageAlt,
         },
       ],
     },
@@ -146,6 +148,7 @@ export function menuJsonLd() {
         "@type": "MenuItem",
         name: dish.name,
         description: dish.desc,
+        image: `${siteUrl}${dish.image}`,
         offers: {
           "@type": "Offer",
           price: dish.price,
