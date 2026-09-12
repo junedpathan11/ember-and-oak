@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { MessageCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Field, { fieldClasses } from "@/components/ui/Field";
 import {
@@ -15,6 +16,7 @@ import {
   submitToWeb3Forms,
   todayISO,
 } from "@/lib/forms";
+import { getPrivateDiningWhatsAppUrl } from "@/lib/whatsapp";
 
 interface FormState {
   name: string;
@@ -36,7 +38,7 @@ const EMPTY: FormState = {
   message: "",
 };
 
-/** Private dining enquiry — same Web3Forms pattern as /reserve, plus room select. */
+/** Private dining enquiry — Web3Forms pattern + dynamic WhatsApp action. */
 export default function EnquiryForm() {
   const { privateDining, business } = site;
 
@@ -75,6 +77,18 @@ export default function EnquiryForm() {
 
     return next;
   }
+
+  // Dynamic WhatsApp link based on current form inputs
+  const dynamicWhatsAppUrl = useMemo(() => {
+    return getPrivateDiningWhatsAppUrl({
+      name: values.name,
+      phone: values.phone,
+      date: values.date,
+      guests: values.guests,
+      room: values.room,
+      message: values.message,
+    });
+  }, [values]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -117,8 +131,8 @@ export default function EnquiryForm() {
   if (succeeded) {
     return (
       <SuccessPanel
-        heading="Request received — we'll confirm on WhatsApp shortly."
-        body="Our private dining team will come back to you with availability and a set menu."
+        heading="Enquiry received — we'll reply on WhatsApp shortly."
+        body="Our private dining coordinator will review your request, room availability and send a customized set menu quote."
       />
     );
   }
@@ -240,12 +254,24 @@ export default function EnquiryForm() {
           />
         </Field>
 
-        <div className="sm:col-span-2">
-          <Button type="submit" variant="primary" disabled={!configured || submitting}>
-            {submitting ? "Sending…" : "Send enquiry"}
-          </Button>
+        <div className="space-y-4 sm:col-span-2">
+          <div className="flex flex-wrap items-center gap-4">
+            <Button type="submit" variant="primary" disabled={!configured || submitting}>
+              {submitting ? "Sending…" : "Send enquiry"}
+            </Button>
 
-          <p className="mt-4 text-[13px] leading-relaxed text-muted">
+            <a
+              href={dynamicWhatsAppUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label-caps inline-flex items-center gap-2 rounded-button border border-hairline bg-surface px-5 py-[14px] text-ink transition-colors duration-300 hover:border-primary hover:text-primary"
+            >
+              <MessageCircle size={15} aria-hidden="true" />
+              Prefer WhatsApp?
+            </a>
+          </div>
+
+          <p className="text-[13px] leading-relaxed text-muted">
             {privateDining.setMenuNote}
           </p>
         </div>
