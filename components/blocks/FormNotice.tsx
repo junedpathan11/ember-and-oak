@@ -34,7 +34,7 @@ export function ErrorNotice({ message }: { message: string }) {
   );
 }
 
-/** Confirmed-success panel that replaces the form. */
+/** Success panel that replaces the form on successful submission. */
 export function SuccessPanel({
   heading,
   body,
@@ -44,10 +44,10 @@ export function SuccessPanel({
 }) {
   return (
     <div role="status" className="border border-hairline bg-surface p-8 md:p-10">
-      <p className="eyebrow">Confirmed</p>
-      <p className="mt-4 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] italic leading-snug tracking-[-0.02em]">
+      <p className="eyebrow">Request Received</p>
+      <h3 className="mt-4 font-display text-[clamp(1.35rem,2.4vw,1.75rem)] italic leading-snug tracking-[-0.02em]">
         {heading}
-      </p>
+      </h3>
       <p className="mt-4 max-w-prose text-[15px] leading-relaxed text-muted">
         {body}
       </p>

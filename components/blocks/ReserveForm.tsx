@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { MessageCircle } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Field, { fieldClasses } from "@/components/ui/Field";
+import BookingSuccess, { type BookingSummary } from "@/components/blocks/BookingSuccess";
 import {
   ErrorNotice,
   NotConfiguredNotice,
-  SuccessPanel,
 } from "@/components/blocks/FormNotice";
 import site from "@/content/site";
 import {
@@ -16,6 +17,7 @@ import {
   submitToWeb3Forms,
   todayISO,
 } from "@/lib/forms";
+import { getReservationWhatsAppUrl } from "@/lib/whatsapp";
 
 interface FormState {
   name: string;
@@ -37,6 +39,15 @@ const EMPTY: FormState = {
   occasion: "",
 };
 
+function generateBookingRef(): string {
+  const chars = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+  let result = "EO-";
+  for (let i = 0; i < 4; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
 export default function ReserveForm() {
   const { reservation, business } = site;
 
@@ -46,12 +57,11 @@ export default function ReserveForm() {
   const [values, setValues] = useState<FormState>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
-  const [succeeded, setSucceeded] = useState(false);
+  const [bookingSummary, setBookingSummary] = useState<BookingSummary | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
-    // Clear the field error as soon as the guest starts correcting it.
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
   }
 
@@ -74,6 +84,26 @@ export default function ReserveForm() {
     return next;
   }
 
+  // Dynamic WhatsApp link based on current form inputs
+  const dynamicWhatsAppUrl = useMemo(() => {
+    const occasionLabel =
+      reservation.occasions.find((opt) => opt.value === values.occasion)?.label ??
+      undefined;
+
+    const partyLabel =
+      reservation.partySizes.find((opt) => opt.value === values.party)?.label ??
+      values.party;
+
+    return getReservationWhatsAppUrl({
+      name: values.name,
+      phone: values.phone,
+      date: values.date,
+      time: values.time,
+      party: partyLabel,
+      occasion: occasionLabel,
+    });
+  }, [values, reservation.occasions, reservation.partySizes]);
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (submitting || !configured) return;
@@ -94,10 +124,13 @@ export default function ReserveForm() {
       reservation.occasions.find((option) => option.value === values.occasion)?.label ??
       "No occasion";
 
+    const ref = generateBookingRef();
+
     const result = await submitToWeb3Forms({
-      subject: `Table request — ${values.name} — ${values.date} ${values.time}`,
+      subject: `Table request [${ref}] — ${values.name} — ${values.date} ${values.time}`,
       from_name: `${business.name} website`,
       form_type: "Reservation request",
+      booking_ref: ref,
       name: values.name.trim(),
       phone: values.phone.trim(),
       date: values.date,
@@ -110,7 +143,15 @@ export default function ReserveForm() {
 
     // Success is only ever set on a confirmed 200 from the API.
     if (result.ok) {
-      setSucceeded(true);
+      setBookingSummary({
+        ref,
+        name: values.name.trim(),
+        phone: values.phone.trim(),
+        date: values.date,
+        time: values.time,
+        party: values.party,
+        occasion: occasionLabel,
+      });
       setValues(EMPTY);
       return;
     }
@@ -118,11 +159,11 @@ export default function ReserveForm() {
     setApiError(result.message ?? null);
   }
 
-  if (succeeded) {
+  if (bookingSummary) {
     return (
-      <SuccessPanel
-        heading="Request received — we'll confirm on WhatsApp shortly."
-        body={reservation.sub}
+      <BookingSuccess
+        summary={bookingSummary}
+        onReset={() => setBookingSummary(null)}
       />
     );
   }
@@ -259,13 +300,26 @@ export default function ReserveForm() {
           </p>
         ) : null}
 
-        <div className="sm:col-span-2">
-          <Button type="submit" variant="primary" disabled={!configured || submitting}>
-            {submitting ? "Sending…" : "Request a table"}
-          </Button>
+        <div className="space-y-4 sm:col-span-2">
+          <div className="flex flex-wrap items-center gap-4">
+            <Button type="submit" variant="primary" disabled={!configured || submitting}>
+              {submitting ? "Sending request…" : "Request a table"}
+            </Button>
 
-          <p className="mt-4 text-[13px] leading-relaxed text-muted">
-            This is a request, not a confirmed booking — we reply on WhatsApp.
+            <a
+              href={dynamicWhatsAppUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="label-caps inline-flex items-center gap-2 rounded-button border border-hairline bg-surface px-5 py-[14px] text-ink transition-colors duration-300 hover:border-primary hover:text-primary"
+            >
+              <MessageCircle size={15} aria-hidden="true" />
+              Prefer WhatsApp?
+            </a>
+          </div>
+
+          <p className="text-[13px] leading-relaxed text-muted">
+            This is a booking request, not an instant confirmation. Our team
+            verifies table availability and confirms on WhatsApp.
           </p>
         </div>
       </form>

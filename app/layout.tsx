@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { fraunces, inter } from "./fonts";
-import DemoBanner from "@/components/blocks/DemoBanner";
 import Navbar from "@/components/blocks/Navbar";
 import Footer from "@/components/blocks/Footer";
 import WhatsAppFab from "@/components/blocks/WhatsAppFab";
@@ -24,7 +23,6 @@ export const metadata: Metadata = {
     icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
     apple: [{ url: "/favicon.svg" }],
   },
-  // Makes the demo status legible to crawlers and link unfurls too.
   other: { "demo-notice": site.business.demoLabel },
 };
 
@@ -46,7 +44,6 @@ export default function RootLayout({
           Skip to content
         </a>
 
-        <DemoBanner />
         <Navbar />
 
         <main id="main">{children}</main>

@@ -13,7 +13,8 @@ export const metadata: Metadata = buildMetadata({
   description:
     "Two private rooms and a courtyard for 12 to 90 guests in Surat. Set menus from ₹1,450 per guest, with vegetarian and Jain options.",
   path: "/private-dining",
-  image: site.privateDining.hero.image,
+  image: site.privateDining.ogImage,
+  imageAlt: site.privateDining.hero.alt,
 });
 
 export default function PrivateDiningPage() {

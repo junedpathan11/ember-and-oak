@@ -75,15 +75,16 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Mobile trigger */}
+        {/* Mobile trigger with 44px min touch target and accessible ARIA attributes */}
         <button
           type="button"
           onClick={() => setOpen(true)}
-          aria-label="Open menu"
+          aria-label="Open navigation menu"
           aria-expanded={open}
-          className="-mr-2 flex h-10 w-10 items-center justify-center text-ink md:hidden"
+          aria-controls="mobile-menu"
+          className="-mr-2 flex h-11 w-11 items-center justify-center text-ink md:hidden"
         >
-          <Menu size={20} strokeWidth={1.5} aria-hidden="true" />
+          <Menu size={22} strokeWidth={1.5} aria-hidden="true" />
         </button>
       </nav>
 
@@ -103,11 +104,11 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => setOpen(false)}
-              aria-label="Close menu"
+              aria-label="Close navigation menu"
               autoFocus
-              className="-mr-2 flex h-10 w-10 items-center justify-center text-ink"
+              className="-mr-2 flex h-11 w-11 items-center justify-center text-ink"
             >
-              <X size={20} strokeWidth={1.5} aria-hidden="true" />
+              <X size={22} strokeWidth={1.5} aria-hidden="true" />
             </button>
           </div>
 
