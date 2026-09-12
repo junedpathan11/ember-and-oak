@@ -7,6 +7,7 @@ import Footer from "@/components/blocks/Footer";
 import WhatsAppFab from "@/components/blocks/WhatsAppFab";
 import site from "@/content/site";
 import { siteUrl } from "@/lib/seo";
+import { tokens } from "@/lib/tokens";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FAF7F2",
+  themeColor: tokens.bg,
   colorScheme: "light",
 };
 

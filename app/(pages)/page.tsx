@@ -14,6 +14,7 @@ export const metadata: Metadata = buildMetadata({
   title: `${site.business.name} — ${site.business.tagline}`,
   description: site.business.description,
   path: "/",
+  absoluteTitle: true,
 });
 
 export default function HomePage() {

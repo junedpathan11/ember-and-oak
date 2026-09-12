@@ -29,8 +29,12 @@ export default function DishStrip() {
               key={dish.name}
               className="group grid gap-6 border-t py-10 md:grid-cols-12 md:items-center md:gap-12 md:py-14"
             >
+              {/* Columns are placed explicitly so the reversed rows stay
+                  flush with the outer margins instead of auto-flowing. */}
               <div
-                className={`md:col-span-6 ${reversed ? "md:order-2" : "md:order-1"}`}
+                className={`md:col-span-6 ${
+                  reversed ? "md:order-2 md:col-start-7" : "md:order-1 md:col-start-1"
+                }`}
               >
                 <DishImage
                   src={dish.image}

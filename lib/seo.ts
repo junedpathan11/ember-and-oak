@@ -17,6 +17,8 @@ interface PageMetaInput {
   description: string;
   path: string;
   image?: string;
+  /** Bypass the "%s · Ember & Oak" template (used by the home page). */
+  absoluteTitle?: boolean;
 }
 
 /**
@@ -28,12 +30,13 @@ export function buildMetadata({
   description,
   path,
   image = ogImage,
+  absoluteTitle = false,
 }: PageMetaInput): Metadata {
   const url = path === "/" ? siteUrl : `${siteUrl}${path}`;
   const absoluteImage = image.startsWith("http") ? image : `${siteUrl}${image}`;
 
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical: url },
     openGraph: {

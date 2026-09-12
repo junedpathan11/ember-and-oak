@@ -123,12 +123,14 @@
 }
 
 /* Marquee: slow 30s loop. */
+/* Two identical halves each shift left by their own full width, so the
+   loop restarts exactly where it began. */
 @keyframes marquee-scroll {
   from {
     transform: translateX(0);
   }
   to {
-    transform: translateX(-50%);
+    transform: translateX(-100%);
   }
 }
 
